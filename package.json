@@ -1,0 +1,27 @@
+{
+  "name": "meetup-trivia",
+  "version": "1.0.0",
+  "description": "Trivia game for meetups",
+  "author": "Tabcorp Digital Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TabDigital/meetup-trivia.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TabDigital/meetup-trivia/issues"
+  },
+  "homepage": "https://github.com/TabDigital/meetup-trivia#readme",
+  "scripts": {
+    "start": "pm2 start app.js",
+    "dev": "pm2 start app.js --watch"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "babel-core": "^6.2.1",
+    "express": "^4.13.3",
+    "express-handlebars": "^2.0.1",
+    "pm2": "^0.15.10"
+  },
+  "devDependencies": {}
+}
