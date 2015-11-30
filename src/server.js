@@ -1,6 +1,9 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const sse = require('tiny-sse');
+const game = require('./models/game');
+const players = require('./models/players');
+const sockets = require('./models/sockets');
 
 const app = express();
 
@@ -30,7 +33,7 @@ app.post('/players', function(req, res) {
     if (err) {
       res.send(400, '/');
     } else {
-      res.redirect('/game/players/' + player.id);
+      res.redirect('/players/' + player.id);
     }
   })
 });
@@ -39,7 +42,7 @@ app.post('/players', function(req, res) {
 // Player logged in
 // All different states handled client-side
 //
-app.get('/player/:id', sse.head(), sse.ticker({seconds: 15}), function(req, res) {
+app.get('/players/:id', sse.head(), sse.ticker({seconds: 15}), function(req, res) {
   players.get(req.params.id, function(err, player) {
     if (err) res.redirect('/');
     else res.render('game-inplay');
@@ -49,7 +52,7 @@ app.get('/player/:id', sse.head(), sse.ticker({seconds: 15}), function(req, res)
 //
 // SSE stream for player updates
 //
-app.get('/player/:id/events', sse.head(), sse.ticker({seconds: 15}), function(req, res) {
+app.get('/players/:id/events', sse.head(), sse.ticker({seconds: 15}), function(req, res) {
   players.get(req.params.id, function(err, player) {
     if (err) return res.send(400);
     sockets.attach(req.params.id, req, res);
@@ -59,7 +62,7 @@ app.get('/player/:id/events', sse.head(), sse.ticker({seconds: 15}), function(re
 //
 // Player choosing an answer
 //
-app.post('/player/:id/answers/:question', function(req, res) {
+app.post('/players/:id/answers/:question', function(req, res) {
   players.get(req.params.id, function(err, player) {
     if (err) return res.send(400);
     // TODO: save the answer

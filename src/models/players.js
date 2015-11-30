@@ -5,7 +5,6 @@
 //
 
 exports.create = function(data, cb) {
-  players.
   cb(null, {
     id: 'bd9ac52e'
   });

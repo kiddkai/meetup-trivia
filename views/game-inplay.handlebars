@@ -48,7 +48,7 @@ TODO: render different view depending on the state:
 
 <script>
   function poll() {
-    var source = new EventSource("/player/" + Math.floor(Math.random()*100) + '/events');
+    var source = new EventSource("/players/" + Math.floor(Math.random()*100) + '/events');
     source.addEventListener('status', function(e) {
         console.log(e.data);
     });
