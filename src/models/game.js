@@ -1,6 +1,4 @@
 
-module.exports = {
-  state: function() {
-    return 'lobby';
-  }
-}
+exports.state = function() {
+  return 'lobby';
+};

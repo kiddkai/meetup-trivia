@@ -6,6 +6,16 @@ const game = require('../models/game');
 const app = express();
 module.exports = app;
 
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+
+io.on('connection', function(socket){
+  console.log("url"+socket.handshake.url);
+  clientId=socket.handshake.query.clientId;
+  console.log("connected clientId:"+clientId);
+});
+
+
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('views', './views');
 app.set('view engine', 'handlebars');
@@ -19,6 +29,9 @@ app.get('/', function(req, res) {
 });
 
 app.post('/players', function(req, res) {
+  if (game.state() != 'lobby') {
+    return res.render('game-closed');
+  }
   players.create(req.body, function(err, player) {
     if (err) {
       res.send(400, '/');
@@ -29,17 +42,13 @@ app.post('/players', function(req, res) {
 });
 
 app.get('/players/:id', function(req, res) {
-  res.render('player', {
-    name: 'Bob',
-    score: 12
+  players.get(req.params.id, function(err, player) {
+    if (err) {
+      res.redirect('/game');
+    } else if (game.state() == 'lobby') {
+      res.render('player-lobby', player);
+    }
   });
-  // render page for player
-  // several possible states, could each be different views
-  // - waiting in lobby
-  // - question (with optional answer chosen)
-  // - answer time
-  // - won
-  // - lost
 });
 
 app.post('/players/:id/answers/:number', function(req, res) {
