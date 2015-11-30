@@ -13,12 +13,13 @@
   },
   "homepage": "https://github.com/TabDigital/meetup-trivia#readme",
   "scripts": {
-    "start": "pm2 start app.js",
-    "dev": "pm2 start app.js --watch"
+    "start": "pm2 start src/server.js",
+    "dev": "pm2 start src/server.js --watch",
+    "restart": "pm2 restart server",
+    "list": "pm2 list server"
   },
   "main": "index.js",
   "dependencies": {
-    "babel-core": "^6.2.1",
     "express": "^4.13.3",
     "express-handlebars": "^2.0.1",
     "pm2": "^0.15.10"

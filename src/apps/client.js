@@ -1,9 +1,10 @@
 const express = require('express');
 const exphbs  = require('express-handlebars');
-const players = require('./players');
-const game = require('./game');
+const players = require('../models/players');
+const game = require('../models/game');
 
 const app = express();
+module.exports = app;
 
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('views', './views');
@@ -19,8 +20,11 @@ app.get('/', function(req, res) {
 
 app.post('/players', function(req, res) {
   players.create(req.body, function(err, player) {
-    if (err) res.send(400, '/');
-    else res.redirect(`/player/${player.id}`);
+    if (err) {
+      res.send(400, '/');
+    } else {
+      res.redirect('/player/' + player.id);
+    }
   })
 });
 
@@ -41,11 +45,4 @@ app.get('/players/:id', function(req, res) {
 app.post('/players/:id/answers/:number', function(req, res) {
   // save answer
   // 302 redirect to player
-});
-
-const server = app.listen(3000, function () {
-  const host = server.address().address;
-  const port = server.address().port;
-
-  console.log('Example app listening at http://%s:%s', host, port);
 });
