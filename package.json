@@ -16,7 +16,7 @@
     "start": "pm2 start src/server.js",
     "dev": "pm2 start src/server.js --watch",
     "restart": "pm2 restart server",
-    "list": "pm2 list server"
+    "show": "pm2 show server"
   },
   "main": "index.js",
   "dependencies": {

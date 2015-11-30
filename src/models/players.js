@@ -1,6 +1,8 @@
 
 module.exports = {
-  create: function(cb) {
-    cb(null, {});
+  create: function(data, cb) {
+    cb(null, {
+      id: 'bd9ac52e'
+    });
   }
 }

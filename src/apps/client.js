@@ -23,7 +23,7 @@ app.post('/players', function(req, res) {
     if (err) {
       res.send(400, '/');
     } else {
-      res.redirect('/player/' + player.id);
+      res.redirect('/game/players/' + player.id);
     }
   })
 });
