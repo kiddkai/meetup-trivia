@@ -1,0 +1,70 @@
+
+{{name}} ({{score}})
+Waiting for the game to start...
+
+TODO: render different view depending on the state:
+
+<pre>
+{
+  name: 'Bob',
+  score: 20,
+  question: 4,
+  choice: null,
+  answer: null,
+}
+--> header with name + score
+--> four clickable buttons
+
+{
+  name: 'Bob',
+  score: 20,
+  question: 4,
+  choice: 'B',
+  answer: null
+}
+--> header with name + score
+--> four inactive buttons, B highlighted
+
+{
+  name: 'Bob',
+  score: 20,
+  question: 4,
+  choice: 'B',
+  answer: 'B'
+}
+--> header with name + score
+--> four inactive buttons, B in green
+
+{
+  name: 'Bob',
+  score: 20,
+  question: 4,
+  choice: 'B',
+  answer: 'C'
+}
+--> header with name + score
+--> four inactive buttons, B in red, C in green
+</pre>
+
+<script>
+  function poll() {
+    var source = new EventSource("/player/" + Math.floor(Math.random()*100) + '/events');
+    source.addEventListener('status', function(e) {
+        console.log(e.data);
+    });
+    source.onmessage = function(e) {
+      //called when data is provided without event name
+    }
+    source.onopen = function(e) {
+      //called when socket is listenning
+    }
+    source.onerror = function(e) {
+      // if socket error, try again after 2 seconds
+      source.close();
+      setTimeout(function() {
+        poll();
+      }, 2000);
+    }
+  }
+  poll();
+</script>

@@ -1,5 +1,6 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
+const sse = require('tiny-sse');
 
 const app = express();
 
@@ -7,38 +8,87 @@ app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('views', './views');
 app.set('view engine', 'handlebars');
 
+//
+// Lobby (player not logged in)
+//
 app.get('/', function(req, res) {
-  res.render('player-lobby');
+  if (game.state() == 'lobby') {
+    res.render('game-lobby');
+  } else {
+    res.render('game-closed');
+  }
 });
 
-const sse = require('tiny-sse');
+//
+// Create a player
+//
+app.post('/players', function(req, res) {
+  if (game.state() != 'lobby') {
+    return res.render('game-closed');
+  }
+  players.create(req.body, function(err, player) {
+    if (err) {
+      res.send(400, '/');
+    } else {
+      res.redirect('/game/players/' + player.id);
+    }
+  })
+});
+
+//
+// Player logged in
+// All different states handled client-side
+//
 app.get('/player/:id', sse.head(), sse.ticker({seconds: 15}), function(req, res) {
-  setInterval(function() {
-    const data = {
-      id: Math.floor(Math.random()*100),
-      question: Math.floor(Math.random()*100),
-      answer: 'B'
-    };
-    sse.send({event: 'status', data: data})(req, res);
-  }, 1000);
-  // req.end();
+  players.get(req.params.id, function(err, player) {
+    if (err) res.redirect('/');
+    else res.render('game-inplay');
+  });
 });
 
-// presenter should have BasicAuth
-// app.use('/game', require('./apps/client'));
-// app.use('/presenter', require('./apps/presenter'));
+//
+// SSE stream for player updates
+//
+app.get('/player/:id/events', sse.head(), sse.ticker({seconds: 15}), function(req, res) {
+  players.get(req.params.id, function(err, player) {
+    if (err) return res.send(400);
+    sockets.attach(req.params.id, req, res);
+  });
+});
+
+//
+// Player choosing an answer
+//
+app.post('/player/:id/answers/:question', function(req, res) {
+  players.get(req.params.id, function(err, player) {
+    if (err) return res.send(400);
+    // TODO: save the answer
+    sendPlayerState(player);
+  })
+});
+
+app.post('/game/start', function(req, res) {
+  game.start();
+  updateAllPlayers();
+});
+
+function sendAllStates() {
+  // for each player: sendPlayerState
+}
+
+function sendPlayerState(player) {
+  // TODO: merge game state and player state
+  const status = {
+    score: 20,
+    question: 4,
+    choice: 'B',
+    answer: null
+  };
+  sockets.send(player.id, 'status', status);
+}
 
 const server = app.listen(3000, function () {
   const host = server.address().address;
   const port = server.address().port;
   console.log('Example app listening at http://%s:%s', host, port);
 });
-
-
-// var io = socketio.listen(server);
-// io.on('connection', function(socket){
-//   console.log("url"+socket.handshake.url);
-//   clientId=socket.handshake.query.clientId;
-//   console.log("connected clientId:"+clientId);
-// });
-//
